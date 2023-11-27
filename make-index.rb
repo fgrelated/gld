@@ -68,7 +68,7 @@ puts <<EOF
    x: {
     type: 'timeseries',
     tick: {
-     format: '%Y-%m'
+     format: '%Y-%m-%d'
     },
     padding: { right: 0, left: 0 }
    },
