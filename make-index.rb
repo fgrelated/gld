@@ -70,7 +70,6 @@ puts <<EOF
     tick: {
      format: '%Y-%m-%d'
     },
-    padding: { right: 0, left: 0 }
    },
    y: {
     tick: {
@@ -80,7 +79,6 @@ puts <<EOF
 	text: 'tonnes',
 	position: 'outer-middle'
     },
-    padding: { top: 0, bottom: 0 }
    },
   },
  });
