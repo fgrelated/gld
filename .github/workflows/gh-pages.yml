@@ -1,0 +1,37 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with: 
+          repository: fgrelated/gld
+          ref: main
+          path: data
+          
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with: 
+          ruby-version: 2.6
+          
+      - name: Make
+        run: |
+            mkdir ./public
+            cp data/c3* data/d3* ./public/
+            ruby data/make-index.rb > ./public/index.html
+            
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with: 
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
