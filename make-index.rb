@@ -4,12 +4,13 @@ require 'open-uri'
 require 'date'
 require 'bigdecimal'
 
+cache = 'GLD_US_archive_EN.csv'
 data_url = 'http://www.spdrgoldshares.com/assets/dynamic/GLD/GLD_US_archive_EN.csv'
-#data_url = 'GLD_US_archive_EN.csv'
+source = FileTest.exist?(cache) ? cache : data_url
 
 data = []
 
-URI.open(data_url) do |f|
+URI.open(source) do |f|
   f.each_line do |l|
     l.strip!
     next unless l =~ /^[0-9]/
@@ -85,10 +86,28 @@ puts <<EOF
     </script>
     <h2>Timeseries</h2>
     <table>
-      <tr><th>Date</th><th>Tonnage</th><th>Troy OZ</th></tr>
+      <tr><th>Date</th><th>Tonnage</th><th>Troy OZ</th><th>Δ Tonnage</th><th>Δ Troy OZ</th></tr>
 EOF
-data.reverse.each do |date, t, oz|
-  puts "<tr><td>#{date.strftime("%Y-%m-%d")}</td><td>#{"%.02f" % t}</td><td>#{"%.02f" % oz}</td></tr>"
+
+def color_for(x)
+  if x > 0
+    "color: green;"
+  elsif x < 0
+    "color: red;"
+  else
+    ""
+  end
+end
+dr = data.reverse
+dr.zip(dr[1..-1]).each do |(date, t, oz), (d2, t2, oz2)|
+  puts "<tr>"
+  puts "<td>#{date.strftime("%Y-%m-%d")}</td><td>#{"%.02f" % t}</td><td>#{"%.02f" % oz}</td>"
+  if d2
+    puts "<td style=\"#{color_for(t-t2)}\">#{"%.02f" % (t-t2)}</td><td style=\"#{color_for(t-t2)}\">#{"%.02f" % (oz-oz2)}</td>"
+  else
+    puts "<td>&nbsp;</td><td>&nbsp;</td>"
+  end
+  puts "</tr>"
 end
 puts <<EOF
     </table>
