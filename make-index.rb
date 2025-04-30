@@ -10,14 +10,37 @@ source = FileTest.exist?(cache) ? cache : data_url
 
 data = []
 
+def find_or_die(arr, re)
+  res = arr.grep(re)
+  unless res.size == 1
+    raise "Couldn't find #{re.inspect} in array: #{res.size} / #{res.inspect}"
+  end
+  arr.find_index(res.first)
+end
+
 URI.open(source) do |f|
+  date_field, oz_field, tonnes_field = nil, nil, nil
+  first_line = true
+
   f.each_line do |l|
     l.strip!
+    if first_line
+      first_line = false
+      fields = l.split(/\s*,\s*/)
+      date_field = find_or_die(fields, /Date/)
+      tonnes_field = find_or_die(fields, /Tonnes/)
+      oz_field = find_or_die(fields, /Ounces/)
+      next
+    end
+
     next unless l =~ /^[0-9]/
     next if l =~ /HOLIDAY.*HOLIDAY/
     fields = l.split(/\s*,\s*/)
     next unless fields[9] =~ /^[0-9.]*$/
-    date, oz, tonnes = Date.parse(fields[0]), BigDecimal(fields[9]), BigDecimal(fields[10])
+
+    date = Date.parse(fields[date_field])
+    oz = BigDecimal(fields[oz_field])
+    tonnes = BigDecimal(fields[tonnes_field])
     data << [date, tonnes, oz]
   end
 end
