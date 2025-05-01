@@ -25,6 +25,7 @@ URI.open(source) do |f|
   f.each_line do |l|
     l.strip!
     if first_line
+      next unless l =~ /Date/
       first_line = false
       fields = l.split(/\s*,\s*/)
       date_field = find_or_die(fields, /Date/)
