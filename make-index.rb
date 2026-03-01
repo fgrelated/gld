@@ -30,7 +30,7 @@ URI.open(source) do |f|
       fields = l.split(/\s*,\s*/)
       date_field = find_or_die(fields, /Date/)
       tonnes_field = find_or_die(fields, /Tonnes/)
-      oz_field = find_or_die(fields, /Ounces/)
+      oz_field = find_or_die(fields, /Total Ounces of Gold in the Trust/)
       next
     end
 

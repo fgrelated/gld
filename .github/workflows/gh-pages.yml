@@ -25,8 +25,27 @@ jobs:
         uses: ruby/setup-ruby@v1
         with: 
           ruby-version: 3.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas openpyxl
           
-      - name: Make
+      - name: Fetch GLD data
+        run: |
+            wget 'https://api.spdrgoldshares.com/api/v1/historical-archive?product=gld&exchange=NYSE&lang=en' -O gld.xlsx
+
+      - name: Convert GLD xlsx to csv
+        run: |
+            python data/convert-xlsx.py
+            ln -fs "$(grep -l '^29-Feb-2024,18' gld*.csv)" GLD_US_archive_EN.csv
+
+      - name: Make output
         run: |
             mkdir ./public
             cp data/c3* data/d3* ./public/
